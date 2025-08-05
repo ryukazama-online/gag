@@ -2,28 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Item Manager</title>
+  <title>Item Collector</title>
   <style>
     body {
       font-family: sans-serif;
-      background: #f7f7f7;
+      background: #f0f0f0;
       padding: 20px;
     }
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
+    .container {
+      max-width: 500px;
+      margin: auto;
+    }
+    .login-box, .item-box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .login-box input {
+      padding: 10px;
+      width: 100%;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+    .login-box button {
+      padding: 10px;
+      width: 100%;
+      background: #4CAF50;
+      border: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
     }
     .item {
-      background: white;
-      padding: 15px;
-      margin: 10px auto;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      max-width: 500px;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
     .status.ready {
       color: green;
@@ -33,31 +53,67 @@
       color: red;
       font-weight: bold;
     }
-    button {
+    button.collect {
       padding: 6px 12px;
       border: none;
-      border-radius: 6px;
-      background-color: #4CAF50;
+      border-radius: 5px;
+      background-color: #2196F3;
       color: white;
       cursor: pointer;
     }
-    button:disabled {
+    button.collect:disabled {
       background-color: #ccc;
       cursor: not-allowed;
+    }
+    .welcome {
+      margin-bottom: 20px;
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
 
-  <h1>📦 Item Inventory</h1>
-  <div id="item-list"></div>
+  <div class="container">
+    <!-- LOGIN SECTION -->
+    <div class="login-box" id="login-box">
+      <h2>🔐 Login</h2>
+      <input type="text" id="username" placeholder="Masukkan username" />
+      <button onclick="login()">Login</button>
+    </div>
+
+    <!-- ITEM SECTION -->
+    <div class="item-box" id="item-box" style="display:none;">
+      <div class="welcome">Halo, <span id="userDisplay"></span> 👋</div>
+      <div id="item-list"></div>
+    </div>
+  </div>
 
   <script>
+    // USERNAME YANG DIIJINKAN LOGIN
+    const allowedUsers = ['admin', 'user1', 'pembeli'];
+
+    // DATA ITEM
     let items = [
-      { id: 1, name: 'Raccoon', ready: true },
-      { id: 2, name: 'Kitsune', ready: false },
-      { id: 3, name: 'Fennec Fox', ready: true },
+      { id: 1, name: 'Item A', ready: true },
+      { id: 2, name: 'Item B', ready: false },
+      { id: 3, name: 'Item C', ready: true }
     ];
+
+    let currentUser = null;
+
+    function login() {
+      const usernameInput = document.getElementById('username').value.trim().toLowerCase();
+
+      if (allowedUsers.includes(usernameInput)) {
+        currentUser = usernameInput;
+        document.getElementById('login-box').style.display = 'none';
+        document.getElementById('item-box').style.display = 'block';
+        document.getElementById('userDisplay').textContent = currentUser;
+        renderItems();
+      } else {
+        alert('❌ Username tidak dikenali!');
+      }
+    }
 
     function renderItems() {
       const container = document.getElementById('item-list');
@@ -72,7 +128,7 @@
               ${item.ready ? 'READY' : 'NOT READY'}
             </span>
           </div>
-          <button ${!item.ready ? 'disabled' : ''} onclick="collectItem(${item.id})">
+          <button class="collect" ${!item.ready ? 'disabled' : ''} onclick="collectItem(${item.id})">
             Collect
           </button>
         `;
@@ -84,12 +140,10 @@
       const item = items.find(i => i.id === id);
       if (item && item.ready) {
         item.ready = false;
-        alert(`${item.name} has been collected!`);
+        alert(`${item.name} berhasil di-*collect*!`);
         renderItems();
       }
     }
-
-    renderItems();
   </script>
 
 </body>
