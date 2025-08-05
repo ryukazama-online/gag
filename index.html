@@ -77,8 +77,8 @@
     <!-- LOGIN SECTION -->
     <div class="login-box" id="login-box">
       <h2>🔐 Login</h2>
-      <input type="text" id="username" placeholder="Masukkan username" />
-      <button onclick="login()">Login</button>
+      <input type="text" id="username" placeholder="Masukkan username apa saja" />
+      <button onclick="login()">Masuk</button>
     </div>
 
     <!-- ITEM SECTION -->
@@ -89,56 +89,66 @@
   </div>
 
   <script>
-    // USERNAME YANG DIIJINKAN LOGIN
-    const allowedUsers = ['admin', 'user1', 'pembeli'];
+    // USERNAME YANG DIIJINKAN COLLECT
+    const allowedCollectors = ['admin', 'pio', 'staff'];
 
     // DATA ITEM
     let items = [
-      { id: 1, name: 'Item A', ready: true },
-      { id: 2, name: 'Item B', ready: false },
-      { id: 3, name: 'Item C', ready: true }
+      { id: 1, name: 'Racoonn', ready: true },
+      { id: 2, name: 'Kitsune', ready: false },
+      { id: 3, name: 'Fennec Fox', ready: true }
     ];
 
     let currentUser = null;
+    let canCollect = false;
 
     function login() {
-      const usernameInput = document.getElementById('username').value.trim().toLowerCase();
+      const input = document.getElementById('username');
+      const name = input.value.trim().toLowerCase();
 
-      if (allowedUsers.includes(usernameInput)) {
-        currentUser = usernameInput;
-        document.getElementById('login-box').style.display = 'none';
-        document.getElementById('item-box').style.display = 'block';
-        document.getElementById('userDisplay').textContent = currentUser;
-        renderItems();
-      } else {
-        alert('❌ Username tidak dikenali!');
+      if (name === '') {
+        alert('❌ Masukkan username terlebih dahulu!');
+        return;
       }
+
+      currentUser = name;
+      canCollect = allowedCollectors.includes(currentUser);
+
+      document.getElementById('userDisplay').textContent = currentUser;
+      document.getElementById('login-box').style.display = 'none';
+      document.getElementById('item-box').style.display = 'block';
+      renderItems();
     }
 
     function renderItems() {
       const container = document.getElementById('item-list');
       container.innerHTML = '';
+
       items.forEach(item => {
         const div = document.createElement('div');
         div.className = 'item';
+        const isReady = item.ready;
+        const isDisabled = !isReady || !canCollect;
+
         div.innerHTML = `
           <div>
             <strong>${item.name}</strong><br/>
-            <span class="status ${item.ready ? 'ready' : 'not-ready'}">
-              ${item.ready ? 'READY' : 'NOT READY'}
+            <span class="status ${isReady ? 'ready' : 'not-ready'}">
+              ${isReady ? 'READY' : 'NOT READY'}
             </span>
           </div>
-          <button class="collect" ${!item.ready ? 'disabled' : ''} onclick="collectItem(${item.id})">
+          <button class="collect" ${isDisabled ? 'disabled' : ''} onclick="collectItem(${item.id})">
             Collect
           </button>
         `;
+
         container.appendChild(div);
       });
     }
 
     function collectItem(id) {
       const item = items.find(i => i.id === id);
-      if (item && item.ready) {
+      if (item && item.ready && canCollect) {
         item.ready = false;
         alert(`${item.name} berhasil di-*collect*!`);
         renderItems();
